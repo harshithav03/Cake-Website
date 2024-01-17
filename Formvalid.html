@@ -1,0 +1,158 @@
+<html>
+
+<head>
+    <title>form validation</title>
+    <script type="text/javascript">
+        function formvalidation() {
+            var uname1 = document.getElementById("uname");
+            var regno = document.getElementById("reg");
+            var dob = document.getElementById("dob");
+            var progr = document.getElementById("prog");
+            var email = document.getElementById("email");
+            var phn = document.getElementById("phno");
+            var padd = document.getElementById("padd");
+            var tadd = document.getElementById("tadd");
+
+            if (user_name(uname1, 5, 30)) {
+                if (reg_no(regno)) {
+                    if (date_of_birth(dob)) {
+                        if (programme(progr)) {
+                            if (email_id(email)) {
+                                if (phone_no(phn, 10)) {
+                                    if (permanent_address(padd)) {
+                                        if (temporary_address(tadd)) {
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        function user_name(uname1, my, mx) {
+            var letters = /^[A-Za-z]+$/;
+            var uname1_len = uname1.value.length;
+            if (uname1.value.match(letters) && uname1_len >= my && uname1_len <= mx) {
+                return true;
+            }
+
+            else {
+                alert('Username must have alphabet characters only and it should be between ' + my + 'to ' + mx);
+                uname1.focus();
+                return false;
+            }
+        }
+
+        function reg_no(regno) {
+            var letters = /^[a-zA-Z0-9]+$/;
+            if (regno.value.match(letters)) {
+                return true;
+            }
+            else {
+                alert("Registration no should contain alphanumeric value only");
+                regno.focus();
+                return false;
+            }
+        }
+        function email_id(email) {
+            var mailformat = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+            if (email.value.match(mailformat)) {
+                return true;
+            }
+            alert("You have entered an invalid email address!");
+            email.focus();
+            return false;
+        }
+        function phone_no(phn, m) {
+            var no = /^[0-9]+$/;
+
+            if (phn.value.match(no) && phn.length === 10) {
+                return true;
+            }
+            else {
+                alert("phone number should contain numbers only and 10 digits are allowed only");
+                phn.focus();
+                return false;
+            }
+        }
+
+
+
+        function temporary_address(padd) {
+            var check = document.getElementById('checkbox');
+            var paddd = document.getElementById('padd');
+            var taddd = document.getElementById('tadd');
+
+            if (check.checked == true) {
+                var paddd_value = paddd.value;
+                taddd.value = paddd_value;
+            }
+            else {
+                taddd.value = '';
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <form>
+        <table>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" maxlength="30" size="30" id="uname"></td>
+            </tr>
+            <tr>
+                <td>Registration no:</td>
+                <td><input type="text" maxlength="30" size="30" id="reg"></td>
+            </tr>
+            <tr>
+                <td>DOB:</td>
+                <td><input type="date" id="date"></td>
+            </tr>
+            <tr>
+                <td>Program:</td>
+                <td>
+                    <select id="prog">
+                        <option>select</option>
+                        <option>BCA</option>
+                        <option>BSC</option>
+                        <option>Bachelors of honours in physics</option>
+                        <option>Bachelors of honours in Chemistry</option>
+                        <option>Bachelors of honours in Mathematics</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="text" maxlength="50" size="30" id="email"></td>
+            </tr>
+            <tr>
+                <td>phone no:</td>
+                <td><input type="text" maxlength="30" size="30" id="phno"></td>
+            </tr>
+            <tr>
+                <td>permanent address:</td>
+                <td><textarea rows="2" cols="30" id="padd"></textarea></td>
+            </tr>
+            <tr>
+                <td><b>is temporary address is same as permanent address</b></td>
+                <td><input type="checkbox" id="checkbox" onclick="temporary_address()"></td>
+            </tr>
+            <tr>
+                <td>temporary addresss:</td>
+                <td><textarea rows="2" cols="30" id="tadd"></textarea></td>
+            </tr>
+            <tr>
+                <td><button onclick="formvalidation()" type="submit">submit</button></td>
+            </tr>
+
+        </table>
+    </form>
+</body>
+
+</html>

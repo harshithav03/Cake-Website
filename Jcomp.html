@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="Full CSS.css">
+    <link rel="stylesheet" href="swiper-bundle.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript">
+        /*Script for login page popup*/
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+        }
+        /*Script for Moving carousal images*/
+        var responsiveSlider = function () {
+
+            var slider = document.getElementById("slider");
+            var sliderWidth = slider.offsetWidth;
+            var slideList = document.getElementById("slideWrap");
+            var count = 1;
+            var items = slideList.querySelectorAll("li").length;
+            var prev = document.getElementById("prev");
+            var next = document.getElementById("next");
+
+            window.addEventListener('resize', function () {
+                sliderWidth = slider.offsetWidth;
+            });
+
+            var prevSlide = function () {
+                if (count > 1) {
+                    count = count - 2;
+                    slideList.style.left = "-" + count * sliderWidth + "px";
+                    count++;
+                }
+                else if (count = 1) {
+                    count = items - 1;
+                    slideList.style.left = "-" + count * sliderWidth + "px";
+                    count++;
+                }
+            };
+
+            var nextSlide = function () {
+                if (count < items) {
+                    slideList.style.left = "-" + count * sliderWidth + "px";
+                    count++;
+                }
+                else if (count = items) {
+                    slideList.style.left = "0px";
+                    count = 1;
+                }
+            };
+            next.addEventListener("click", function () {
+                nextSlide();
+            });
+            prev.addEventListener("click", function () {
+                prevSlide();
+            });
+
+            setInterval(function () {
+                nextSlide()
+            }, 5000);
+
+        };
+
+        window.onload = function () {
+            responsiveSlider();
+        }
+        /*js code for cart*/
+        if (document.readyState == 'loading') {
+            document.addEventListener('DOMContentLoaded', ready)
+        } else {
+            ready()
+        }
+
+        function ready() {
+            var removeCartItemButtons = document.getElementsByClassName('btn-danger')
+            for (var i = 0; i < removeCartItemButtons.length; i++) {
+                var button = removeCartItemButtons[i]
+                button.addEventListener('click', removeCartItem)
+            }
+
+            var quantityInputs = document.getElementsByClassName('cart-quantity-input')
+            for (var i = 0; i < quantityInputs.length; i++) {
+                var input = quantityInputs[i]
+                input.addEventListener('change', quantityChanged)
+            }
+
+            var addToCartButtons = document.getElementsByClassName('shop-item-button')
+            for (var i = 0; i < addToCartButtons.length; i++) {
+                var button = addToCartButtons[i]
+                button.addEventListener('click', addToCartClicked)
+            }
+
+            document.getElementsByClassName('btn-purchase')[0].addEventListener('click', purchaseClicked)
+        }
+
+        function purchaseClicked() {
+            if (itemnumbers == 0) {
+                alert("no item selected - please select an item");
+            }
+            else {
+                window.open("creditcard.html");
+            }
+            var cartItems = document.getElementsByClassName('cart-items')[0]
+            while (cartItems.hasChildNodes()) {
+                cartItems.removeChild(cartItems.firstChild)
+            }
+            updateCartTotal()
+            numreset();
+        }
+
+        function removeCartItem(event) {
+            var buttonClicked = event.target
+            buttonClicked.parentElement.parentElement.remove()
+            updateCartTotal()
+            itemnumbersub();
+        }
+
+        function quantityChanged(event) {
+            var input = event.target
+            if (isNaN(input.value) || input.value <= 0) {
+                input.value = 1
+            }
+            updateCartTotal()
+        }
+
+        var itemnumbers = 0;
+        function itemnumberadd() {
+            itemnumbers++;
+            changenum();
+
+        }
+
+        function itemnumbersub() {
+            itemnumbers--;
+            changenum();
+
+        }
+
+        function changenum() {
+            document.getElementById("hello").innerHTML = itemnumbers;
+        }
+
+        function numreset() {
+            itemnumbers = 0;
+            changenum();
+        }
+
+        function addToCartClicked(event) {
+
+            var button = event.target
+            var shopItem = button.parentElement.parentElement
+            var title = shopItem.getElementsByClassName('shop-item-title')[0].innerText
+            var price = shopItem.getElementsByClassName('shop-item-price')[0].innerText
+            var imageSrc = shopItem.getElementsByClassName('shop-item-image')[0].src
+
+            var shopitem = event.target
+            addItemToCart(title, price, imageSrc)
+            updateCartTotal()
+
+        }
+
+        function addItemToCart(title, price, imageSrc) {
+            var cartRow = document.createElement('div')
+            cartRow.classList.add('cart-row')
+            var cartItems = document.getElementsByClassName('cart-items')[0]
+            var cartItemNames = cartItems.getElementsByClassName('cart-item-title')
+            for (var i = 0; i < cartItemNames.length; i++) {
+                if (cartItemNames[i].innerText == title) {
+                    alert('This item is already added to the cart')
+                    return
+                }
+            }
+            itemnumberadd();
+            var cartRowContents = `
+        <div class="cart-item cart-column">
+            <img class="cart-item-image" src="${imageSrc}" width="100" height="100">
+            <span class="cart-item-title">${title}</span>
+        </div>
+        <span class="cart-price cart-column">${price}</span>
+        <div class="cart-quantity cart-column">
+            <input class="cart-quantity-input" type="number" value="1">
+            <button class="btn btn-danger" type="button">REMOVE</button>
+        </div>`
+            cartRow.innerHTML = cartRowContents
+            cartItems.append(cartRow)
+            cartRow.getElementsByClassName('btn-danger')[0].addEventListener('click', removeCartItem)
+            cartRow.getElementsByClassName('cart-quantity-input')[0].addEventListener('change', quantityChanged)
+        }
+
+        function updateCartTotal() {
+            var cartItemContainer = document.getElementsByClassName('cart-items')[0]
+            var cartRows = cartItemContainer.getElementsByClassName('cart-row')
+            var total = 0
+            for (var i = 0; i < cartRows.length; i++) {
+                var cartRow = cartRows[i]
+                var priceElement = cartRow.getElementsByClassName('cart-price')[0]
+                var quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0]
+                var price = parseFloat(priceElement.innerText.replace('₹', ''))
+                var quantity = quantityElement.value
+                total = total + (price * quantity)
+            }
+            total = Math.round(total * 100) / 100
+            document.getElementsByClassName('cart-total-price')[0].innerText = '₹' + total
+        }
+    </script>
+</head>
+
+
+
+
+
+
+
+
+<body>
+    <div id="maindiv">
+        <div id="headerdiv">
+            <div id="imagelink">
+
+                <a href="Jcomp.html">
+                    <img src="cake shop logo-edited2.jpg" width="150" height="100"></td>
+                </a>
+            </div>
+            <div class="container-name">
+                <a class="example_f" href="Profile_page.html" target="_blank" rel="nofollow">
+                    <span id="50">Profile</span>
+                </a>
+            </div>
+
+            <div>
+                <input class="search" type="text" placeholder="Search">
+            </div>
+
+
+            <div id="linklogin">
+
+                <div class="open-button" onclick="openForm()">
+                    <div class="link">Login/Sign Up</div>
+                </div>
+            </div>
+            <div id="cartlink">
+                <a href="#1" class="link">My Cart</a>
+            </div>
+            <a href="about us.html">
+                <div class="link" id="aboutuslink">
+                    About Us
+                </div>
+            </a>
+            <div id="contactlink">
+                <a class="link" href="contact.html">Contact</a>
+            </div>
+            <div class="reviewpage">
+                <a class="link" href="Reviewpage.html">Reviews</a>
+            </div>
+        </div>
+
+
+        <div class="form-popup" id="myForm">
+            <form action="/action_page.php" class="form-container">
+                <h1>HELLO!! CAKE LOVERS</h1>
+                Please enter your e-mail ID and Password<br><br>
+
+
+                <label for="email"><b>Email:</b></label><br><br>
+                <input type="text" placeholder="Enter Email" name="email" required><br><br>
+
+                <label for="psw"><b>Password:</b></label><br><br>
+                <input type="password" placeholder="Enter Password" name="psw" required><br><br>
+
+                <button type="submit" class="btn">
+                    <div class="buttonhover">Login</div>
+                </button>
+                &emsp;
+                <button type="button" class="btn register">
+                    <div><a class="buttonhover" href="Register.html" target="_blank">Register</a></div>
+                </button>
+                &emsp;
+                <button type="button" class="btn cancel" onclick="closeForm()">
+                    <div class="buttonhover">Close</div>
+                </button>
+            </form>
+            <div>
+                <img id="img_inside_popup" src="cake_img_for_popup.jpg">
+            </div>
+        </div>
+
+
+        <div id="slider">
+            <ul id="slideWrap">
+                <li><img src="slider.jpeg" alt=""></li>
+                <li><a href="#5"><img src="slider2.jpeg" alt=""></a></li>
+                <li><img src="slider1.jpeg" alt=""></li>
+                <li><a href="#6"><img src="slider3.jpeg" alt=""></a></li>
+                <li><a href="#4"><img src="slider4.jpeg" alt=""></a></li>
+
+            </ul>
+            <a id="prev" href="#">&#8810;</a>
+            <a id="next" href="#">&#8811;</a>
+        </div>
+
+
+        <div id="main">
+            <div class="bestsellerheading">
+                CATEGORIES
+            </div>
+            <div class="top1">
+                <a href="#2">
+                    <div class="photocake">
+                        <h1 style="color: white;">PHOTO CAKES</h1>
+                    </div>
+                </a>
+                <a href="#3">
+                    <div class="barbiecake">
+                        <h1 style="color: white;">BARBIE CAKES</h1>
+                    </div>
+                </a>
+                <a href="#4">
+                    <div class="fondantcake">
+                        <h1 style="color: white;">FONDANT CAKES</h1>
+                    </div>
+                </a>
+            </div>
+            <div class="bottom1">
+                <a href="#5">
+                    <div class="egglesscake">
+                        <h1 style="color: white;">EGGLESS CAKE</h1>
+                    </div>
+                </a>
+                <a href="#6">
+                    <div class="heartshapedcake">
+                        <h2 style="color: white;">HEART SHAPED CAKES</h2>
+                    </div>
+                </a>
+                <a href="#7">
+                    <div class="cupcake">
+                        <h1 style="color: white;">CUPCAKE</h1>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+        <a href="#1">
+            <div class="carticon">
+                <img src="carticon.png" class="carticonimag">
+                <p class="iconnumber" id="hello"></p>
+
+            </div>
+        </a>
+        <header class="main-header">
+            <nav class="main-nav nav">
+                <ul>
+                    <li><a id="100" href="#50">HOME PAGE</a></li>
+                </ul>
+            </nav>
+            <h1 class="band-name band-name-large">EVERYTHING YOU CRAVE FOR</h1>
+        </header>
+        <section class="container content-section">
+            <h2 id="2" class="section-header">PHOTOCAKES</h2>
+            <div class="shop-items">
+                <div class="shop-item">
+                    <span class="shop-item-title">Chota Bheem</span>
+                    <img class="shop-item-image" src="photo4.jpg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹1300</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Disney Cake</span>
+                    <img class="shop-item-image" src="photo5.jpg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹700</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Anniversary Cake</span>
+                    <img class="shop-item-image" src="photo6.jpg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹900</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Birthday Cake</span>
+                    <img class="shop-item-image" src="photo7.jpeg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹1200</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Poster Cake</span>
+                    <img class="shop-item-image" src="photo8.jpg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹855</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Red Velvet Special</span>
+                    <img class="shop-item-image" src="photo1.jpeg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹1200</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="shop-item">
+                    <span class="shop-item-title">Collage Cake</span>
+                    <img class="shop-item-image" src="photo2.jpg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹900</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+
+                <div class="shop-item">
+                    <span class="shop-item-title">Mother's day Cake</span>
+                    <img class="shop-item-image" src="photo3.jpeg">
+                    <div class="shop-item-details">
+                        <span class="shop-item-price">₹1000</span>
+                        <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </section>
+    <section class="container content-section">
+        <h2 id="3" class="section-header">BARBIE CAKES</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Red velvet Barbie</span>
+                <img class="shop-item-image" src="barbie.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1400</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Sweet Strawberry</span>
+                <img class="shop-item-image" src="barbie2.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1200</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Choco Barbie</span>
+                <img class="shop-item-image" src="barbie3.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹900</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Royal Queen Barbie</span>
+                <img class="shop-item-image" src="barbie4.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹2000</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Pineapple Fantasy</span>
+                <img class="shop-item-image" src="barbie5.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">$1500</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Vanilla Dream</span>
+                <img class="shop-item-image" src="barbie6.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1900</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Cinderalla Cake</span>
+                <img class="shop-item-image" src="barbie7.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹2200</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+
+
+        </div>
+        </div>
+    </section>
+    <section class="container content-section">
+        <h2 id="4" class="section-header">FONDANT CAKES</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Jungle Theme</span>
+                <img class="shop-item-image" src="fondant1.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1800</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Boss Baby</span>
+                <img class="shop-item-image" src="fondant3.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1450</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Hello Kitty</span>
+                <img class="shop-item-image" src="fondant4.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1500</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Minions</span>
+                <img class="shop-item-image" src="fondant5.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1700</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Choco Overload</span>
+                <img class="shop-item-image" src="fondant6.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1300</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Unicorn</span>
+                <img class="shop-item-image" src="fondant7.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1840</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Avenger theme</span>
+                <img class="shop-item-image" src="fondant8.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1400</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+
+
+        </div>
+        </div>
+    </section>
+    <section class="container content-section">
+        <h2 id="5" class="section-header">EGGLESS CAKES</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Choco Fantasy</span>
+                <img class="shop-item-image" src="egglesscake1.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹800</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Choco Truffle</span>
+                <img class="shop-item-image" src="egglesscake2.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹505</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Pineapple Cake</span>
+                <img class="shop-item-image" src="egglesscake3.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹450</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Vanilla Cake</span>
+                <img class="shop-item-image" src="egglesscake4.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹600</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Mango Delight</span>
+                <img class="shop-item-image" src="egglesscake5.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹700</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Blackcurrent</span>
+                <img class="shop-item-image" src="egglesscake6.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹500</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Blackforest </span>
+                <img class="shop-item-image" src="egglesscake7.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹700</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+
+            <div class="shop-item">
+                <span class="shop-item-title">Strawberry Punch</span>
+                <img class="shop-item-image" src="egglesscake8.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹400</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <section class="container content-section">
+        <h2 id="6" class="section-header">HEART SHAPED CAKES</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Blueberry Bash</span>
+                <img class="shop-item-image" src="heart1.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹800</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Choco Flakes</span>
+                <img class="shop-item-image" src="heart2.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹700</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title"> Fruity Vanilla</span>
+                <img class="shop-item-image" src="heart3.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹2000</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Mango Vanilaa</span>
+                <img class="shop-item-image" src="heart4.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1450</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Fresh Pineapple</span>
+                <img class="shop-item-image" src="heart5.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹670</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Coffee cake</span>
+                <img class="shop-item-image" src="heart6.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹900</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Kit Kat Cake</span>
+                <img class="shop-item-image" src="heart7.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1600</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+
+            <div class="shop-item">
+                <span class="shop-item-title">Fruit Blast</span>
+                <img class="shop-item-image" src="heart8.jpeg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹1700</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <section class="container content-section">
+        <h2 id="7" class="section-header">CUPCAKES</h2>
+        <div class="shop-items">
+            <div class="shop-item">
+                <span class="shop-item-title">Cherry Light Choco</span>
+                <img class="shop-item-image" src="cupcake1.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹40</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Cheerful Choco</span>
+                <img class="shop-item-image" src="cupcake2.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹50</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Trio Cream</span>
+                <img class="shop-item-image" src="cupcake3.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹35</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Delicious Choc Chip</span>
+                <img class="shop-item-image" src="cupcake4.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹50</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Vanilla purple</span>
+                <img class="shop-item-image" src="cupcake5.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹40</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Coffee Brown</span>
+                <img class="shop-item-image" src="cupcake6.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹25</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+            <div class="shop-item">
+                <span class="shop-item-title">Halloween pumpkin</span>
+                <img class="shop-item-image" src="cupcake7.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹60</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+
+            <div class="shop-item">
+                <span class="shop-item-title">Red Velvet</span>
+                <img class="shop-item-image" src="cupcake9.jpg">
+                <div class="shop-item-details">
+                    <span class="shop-item-price">₹45</span>
+                    <button class="btn btn-primary shop-item-button" type="button">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <div class="fullheight">
+        <section class="container content-section">
+
+            <h2 id="1" class="section-header"><u>CART</u></h2>
+            <div class="cart-row">
+                <span class="cart-item cart-header cart-column">ITEM</span>
+                <span class="cart-price cart-header cart-column">PRICE</span>
+                <span class="cart-quantity cart-header cart-column">QUANTITY</span>
+            </div>
+            <div class="cart-items">
+            </div>
+            <div class="cart-total">
+                <strong class="cart-total-title">Total</strong>
+                <span class="cart-total-price">₹0</span>
+            </div>
+            <form action="creditcard.html">
+                <button class="btn btn-primary btn-purchase" type="button">PURCHASE</button>
+            </form>
+        </section>
+    </div>
+
+
+
+    </div>
+</body>
+
+
+</html>
